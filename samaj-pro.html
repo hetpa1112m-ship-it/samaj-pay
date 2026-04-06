@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SamajPay — Staff Salary Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sidebar:#0f172a;
+  --sidebar2:#1e293b;
+  --accent:#3b82f6;
+  --accent-hover:#2563eb;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --green:#16a34a;
+  --green-bg:#dcfce7;
+  --red:#dc2626;
+  --red-bg:#fee2e2;
+  --orange:#ea580c;
+  --orange-bg:#ffedd5;
+  --purple:#7c3aed;
+  --purple-bg:#ede9fe;
+  --radius:14px;
+  --r-sm:10px;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;transition:transform 0.3s}
+.sidebar-logo{padding:22px 20px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.logo-icon{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{color:white;font-weight:700;font-size:15px;line-height:1.2}
+.logo-sub{color:rgba(255,255,255,0.45);font-size:11px;font-weight:400}
+.sidebar-nav{padding:16px 12px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,0.55);font-size:13.5px;font-weight:500;transition:all 0.18s;margin-bottom:4px}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85)}
+.nav-item.active{background:var(--accent);color:white}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);font-size:11px}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger svg{width:22px;height:22px;color:var(--text)}
+.page-title{font-size:17px;font-weight:700;color:var(--text)}
+.page-date{font-size:12px;color:var(--muted);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.month-select{border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);background:var(--card);cursor:pointer;outline:none}
+.month-select:focus{border-color:var(--accent)}
+.dark-toggle{background:none;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--muted);font-size:16px}
+
+.content{padding:24px;flex:1}
+
+/* PAGES */
+.page{display:none;animation:fadeIn 0.2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);border:1px solid var(--border)}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px}
+.stat-icon.blue{background:#dbeafe}
+.stat-icon.green{background:var(--green-bg)}
+.stat-icon.purple{background:var(--purple-bg)}
+.stat-icon.orange{background:var(--orange-bg)}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-0.03em;color:var(--text)}
+.stat-label{font-size:12.5px;font-weight:600;color:var(--text);margin:2px 0 2px}
+.stat-sub{font-size:11.5px;color:var(--muted)}
+
+/* SECTION CARD */
+.section-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:20px;overflow:hidden}
+.section-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.section-head h3{font-size:14px;font-weight:700}
+.section-head span{font-size:12px;color:var(--muted)}
+
+/* DEPT BARS */
+.dept-list{padding:16px 20px}
+.dept-row{margin-bottom:14px}
+.dept-row:last-child{margin-bottom:0}
+.dept-meta{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px}
+.dept-name{font-weight:500}
+.dept-amt{color:var(--muted);font-size:12px}
+.bar-track{height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width 0.6s ease}
+
+/* ALERTS */
+.alert-list{padding:12px 16px}
+.alert-item{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border)}
+.alert-item:last-child{border-bottom:none}
+.avatar{width:36px;height:36px;border-radius:50%;background:#dbeafe;color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.alert-name{font-weight:600;font-size:13px}
+.alert-sub{font-size:11.5px;color:var(--muted)}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-on-leave{background:#fee2e2;color:#b91c1c}
+.badge-active{background:var(--green-bg);color:var(--green)}
+.badge-monthly{background:#dbeafe;color:#1d4ed8}
+.badge-daily{background:var(--green-bg);color:var(--green)}
+
+/* TOP EARNERS */
+.earner-list{padding:12px 16px}
+.earner-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border)}
+.earner-row:last-child{border-bottom:none}
+.rank{width:22px;height:22px;border-radius:50%;background:var(--accent);color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.earner-info{flex:1}
+.earner-name{font-weight:600;font-size:13px}
+.earner-sub{font-size:11.5px;color:var(--muted)}
+.earner-amt{font-weight:700;font-size:14px;color:var(--accent)}
+
+/* EMPLOYEE TABLE */
+.search-bar{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-input{flex:1;min-width:180px;border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;color:var(--text);background:var(--bg)}
+.search-input:focus{border-color:var(--accent)}
+.filter-sel{border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--muted);background:var(--bg);cursor:pointer;outline:none}
+
+.emp-table{width:100%;border-collapse:collapse}
+.emp-table th{padding:11px 16px;font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;text-align:left;background:#f8fafc;border-bottom:1px solid var(--border)}
+.emp-table td{padding:12px 16px;border-bottom:1px solid #f1f5f9;vertical-align:middle;font-size:13.5px}
+.emp-table tr:last-child td{border-bottom:none}
+.emp-table tr:hover td{background:#f8fafc;cursor:pointer}
+.emp-row-info{display:flex;align-items:center;gap:10px}
+.emp-name-text{font-weight:600;font-size:13.5px}
+.emp-role-text{font-size:11.5px;color:var(--muted)}
+.leave-inp{width:64px;border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;outline:none;background:var(--card);color:var(--text);transition:all 0.2s}
+.leave-inp:focus{border-color:var(--accent)}
+.leave-inp.has-leave{border-color:var(--orange);background:var(--orange-bg);color:var(--orange)}
+.leave-inp.full-absent{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.net-green{color:var(--green);font-weight:700}
+.net-red{color:var(--red);font-weight:700}
+.diff-green{color:var(--green);font-size:11.5px}
+.diff-red{color:var(--red);font-size:11.5px}
+.details-btn{background:#f1f5f9;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--accent);transition:all 0.18s;white-space:nowrap}
+.details-btn:hover{background:#dbeafe;border-color:var(--accent)}
+.table-footer{padding:12px 16px;font-size:12px;color:var(--muted);border-top:1px solid var(--border)}
+
+/* DETAIL PAGE */
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:18px;background:none;border:none}
+.back-btn:hover{text-decoration:underline}
+.profile-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:22px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.profile-top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.avatar-lg{width:56px;height:56px;border-radius:14px;background:#dbeafe;color:var(--accent);font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.profile-name{font-size:20px;font-weight:700}
+.profile-role{font-size:13px;color:var(--muted);margin-top:2px}
+.profile-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.profile-meta span{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}
+
+.edit-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.edit-card h4{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.04em}
+.form-input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;color:var(--text);background:var(--bg);outline:none;transition:border-color 0.2s}
+.form-input:focus{border-color:var(--accent);background:white}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.save-btn{width:100%;background:var(--accent);color:white;border:none;border-radius:10px;padding:13px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.18s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.save-btn:hover{background:var(--accent-hover)}
+
+.net-highlight{background:var(--accent);color:white;border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.net-label{font-size:13px;opacity:0.8;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.net-amount{font-size:36px;font-weight:800;letter-spacing:-0.04em;margin-bottom:4px}
+.net-note{font-size:12px;opacity:0.7}
+
+.breakdown-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.breakdown-card h4{font-size:14px;font-weight:700;margin-bottom:14px}
+.br-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13.5px}
+.br-row:last-child{border-bottom:none;font-weight:700;font-size:14px;padding-top:12px;margin-top:4px}
+.br-label{color:var(--muted)}
+.br-row.total .br-label{color:var(--text)}
+.br-val-green{color:var(--green);font-weight:600}
+.br-val-red{color:var(--red);font-weight:600}
+.br-val-blue{color:var(--accent);font-weight:700}
+
+.attendance-summary{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.attendance-summary h4{font-size:14px;font-weight:700;margin-bottom:16px}
+.att-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.att-cell{text-align:center;padding:14px;background:var(--bg);border-radius:10px}
+.att-val{font-size:24px;font-weight:800;letter-spacing:-0.03em}
+.att-val.green{color:var(--green)}
+.att-val.orange{color:var(--orange)}
+.att-val.purple{color:var(--purple)}
+.att-lbl{font-size:11.5px;color:var(--muted);margin-top:3px}
+
+/* PAYROLL SUMMARY PAGE */
+.payroll-total-card{background:linear-gradient(135deg,#1e40af 0%,#3b82f6 100%);color:white;border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.pt-label{font-size:13px;opacity:0.8;margin-bottom:6px}
+.pt-amount{font-size:38px;font-weight:800;letter-spacing:-0.04em;margin-bottom:4px}
+.pt-sub{font-size:12px;opacity:0.7}
+.payroll-table th{background:#f8fafc}
+.payroll-table td:last-child{font-weight:700;color:var(--accent)}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:90}
+.overlay.active{display:block}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .content{padding:16px}
+  .att-grid{gap:8px}
+}
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-val{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏪</div>
+    <div>
+      <div class="logo-text">SamajPay</div>
+      <div class="logo-sub">Small Business Suite</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('employees',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Employees
+    </div>
+    <div class="nav-item" onclick="showPage('payroll',this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Payroll Summary
+    </div>
+  </nav>
+  <div class="sidebar-footer">© 2025 SamajPay<br>16 employees</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-date" id="pageDate"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <select class="month-select" id="monthSel" onchange="onMonthChange()">
+        <option value="0">January</option><option value="1">February</option>
+        <option value="2">March</option><option value="3">April</option>
+        <option value="4">May</option><option value="5">June</option>
+        <option value="6">July</option><option value="7">August</option>
+        <option value="8">September</option><option value="9">October</option>
+        <option value="10">November</option><option value="11">December</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="pg-dashboard">
+      <div class="stat-grid" id="dashStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" class="two-col">
+        <div class="section-card">
+          <div class="section-head"><h3>📊 Payroll Overview</h3></div>
+          <div class="dept-list" id="deptBars"></div>
+        </div>
+        <div class="section-card">
+          <div class="section-head"><h3>⚠️ Attendance Alerts</h3></div>
+          <div class="alert-list" id="alertList"></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-head"><h3>🏆 Top Earners This Month</h3><span id="topEarnerMonth"></span></div>
+        <div class="earner-list" id="earnerList"></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES -->
+    <div class="page" id="pg-employees">
+      <div class="section-card">
+        <div class="search-bar">
+          <span style="color:var(--muted)">🔍</span>
+          <input class="search-input" id="searchInput" placeholder="Search employees..." oninput="filterEmployees()"/>
+          <select class="filter-sel" id="typeFilter" onchange="filterEmployees()">
+            <option value="">All Types</option>
+            <option value="monthly">Monthly</option>
+            <option value="daily">Daily</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="emp-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Base Salary</th>
+                <th>Leave Days</th>
+                <th>Net Salary</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="empTableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="tableFooter"></div>
+      </div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="page" id="pg-detail">
+      <button class="back-btn" onclick="showPage('employees',null)">← Back to Employees</button>
+      <div id="detailContent"></div>
+    </div>
+
+    <!-- PAYROLL SUMMARY -->
+    <div class="page" id="pg-payroll">
+      <div class="payroll-total-card" id="payrollTotal"></div>
+      <div class="section-card">
+        <div class="section-head"><h3>Full Payroll Breakdown</h3><button onclick="exportCSV()" style="background:white;border:none;border-radius:8px;padding:6px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer">⬇ Export CSV</button></div>
+        <div style="overflow-x:auto">
+          <table class="emp-table payroll-table" id="payrollTable">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Base</th>
+                <th>Leaves</th>
+                <th>Deduction</th>
+                <th>Net Payable</th>
+              </tr>
+            </thead>
+            <tbody id="payrollBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="payrollFooter"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const EMPLOYEES = [
+  {id:1, name:"Babu Bhai",     initials:"BB", salary:12000, type:"monthly"},
+  {id:2, name:"Gita Ben",      initials:"GB", salary:11000, type:"monthly"},
+  {id:3, name:"Sonal Ben",     initials:"SB", salary:11000, type:"monthly"},
+  {id:4, name:"Kinjal Ben",    initials:"KB", salary:11000, type:"monthly"},
+  {id:5, name:"Alpa Ben",      initials:"AB", salary:11000, type:"monthly"},
+  {id:6, name:"Sunita Ben",    initials:"SU", salary:11000, type:"monthly"},
+  {id:7, name:"Raksha Ben",    initials:"RB", salary:17000, type:"monthly"},
+  {id:8, name:"Sajal Ben",     initials:"SJ", salary:12000, type:"monthly"},
+  {id:9, name:"Sangita Ben",   initials:"SG", salary:12000, type:"monthly"},
+  {id:10,name:"Joshna Ben",    initials:"JB", salary:12500, type:"monthly"},
+  {id:11,name:"Pravin Bhai",   initials:"PB", salary:17000, type:"monthly"},
+  {id:12,name:"Lalji Bhai",    initials:"LB", salary:13000, type:"monthly"},
+  {id:13,name:"Dashrath Bhai", initials:"DB", salary:10000, type:"monthly"},
+  {id:14,name:"Kanu Bhai",     initials:"KN", salary:4000,  type:"monthly"},
+  {id:15,name:"Hina Ben",      initials:"HB", salary:150,   type:"daily"},
+  {id:16,name:"Nipa Ben",      initials:"NP", salary:150,   type:"daily"},
+];
+
+const MONTH_DAYS = [31,28,31,30,31,30,31,31,30,31,30,31];
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const AVATAR_COLORS = ["#dbeafe","#dcfce7","#ede9fe","#ffedd5","#fee2e2","#f0fdf4","#fef3c7","#e0f2fe"];
+const AVATAR_TEXT_COLORS = ["#1d4ed8","#15803d","#6d28d9","#c2410c","#b91c1c","#166534","#92400e","#0369a1"];
+
+let leaves = {};
+let currentMonth = new Date().getMonth();
+let currentPage = 'dashboard';
+
+function getDays(){ return MONTH_DAYS[currentMonth]; }
+function fmtRs(n){ return "₹" + Math.round(n).toLocaleString('en-IN'); }
+
+function getBaseFull(emp){
+  return emp.type === 'daily' ? emp.salary * getDays() : emp.salary;
+}
+function getLeave(id){ return parseInt(leaves[id] || 0); }
+function getPresent(id){ return Math.max(0, getDays() - getLeave(id)); }
+function getNet(emp){
+  const l = getLeave(emp.id);
+  const days = getDays();
+  const present = Math.max(0, days - l);
+  if(emp.type === 'daily') return emp.salary * present;
+  return (emp.salary / days) * present;
+}
+function getDailyRate(emp){
+  return emp.type === 'daily' ? emp.salary : emp.salary / getDays();
+}
+function getDeduction(emp){
+  return getBaseFull(emp) - getNet(emp);
+}
+
+function avatarStyle(idx){
+  const i = idx % AVATAR_COLORS.length;
+  return `background:${AVATAR_COLORS[i]};color:${AVATAR_TEXT_COLORS[i]}`;
+}
+
+function initMonth(){
+  const sel = document.getElementById('monthSel');
+  sel.value = currentMonth;
+  const now = new Date();
+  document.getElementById('pageDate').textContent = now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+function onMonthChange(){
+  currentMonth = parseInt(document.getElementById('monthSel').value);
+  renderAll();
+}
+
+function renderAll(){
+  renderDashboard();
+  renderEmployeeTable();
+  renderPayroll();
+}
+
+// ---- DASHBOARD ----
+function renderDashboard(){
+  const totalBase = EMPLOYEES.reduce((s,e)=>s+getBaseFull(e),0);
+  const totalNet = EMPLOYEES.reduce((s,e)=>s+getNet(e),0);
+  const totalLeaves = EMPLOYEES.reduce((s,e)=>s+getLeave(e.id),0);
+  const totalDeductions = totalBase - totalNet;
+  const onLeave = EMPLOYEES.filter(e=>getLeave(e.id)>0).length;
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon blue">👥</div>
+      <div class="stat-val">16</div>
+      <div class="stat-label">Total Employees</div>
+      <div class="stat-sub">${16-onLeave} active · ${onLeave} on leave</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">💰</div>
+      <div class="stat-val">${fmtRs(totalNet)}</div>
+      <div class="stat-label">Monthly Payroll</div>
+      <div class="stat-sub">Net after deductions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">📅</div>
+      <div class="stat-val">${fmtRs(totalDeductions)}</div>
+      <div class="stat-label">Leave Deductions</div>
+      <div class="stat-sub">This month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">📋</div>
+      <div class="stat-val">${totalLeaves}</div>
+      <div class="stat-label">Total Leave Days</div>
+      <div class="stat-sub">${MONTH_NAMES[currentMonth]} ${new Date().getFullYear()}</div>
+    </div>
+  `;
+
+  // dept bars — group by salary range
+  const groups = [
+    {name:"High Salary (17k+)", emps: EMPLOYEES.filter(e=>e.salary>=17000)},
+    {name:"Mid-High (12k–16k)",  emps: EMPLOYEES.filter(e=>e.salary>=12000 && e.salary<17000)},
+    {name:"Mid (10k–12k)",       emps: EMPLOYEES.filter(e=>e.salary>=10000 && e.salary<12000)},
+    {name:"Daily Wage",          emps: EMPLOYEES.filter(e=>e.type==='daily')},
+  ];
+  const maxGrp = Math.max(...groups.map(g=>g.emps.reduce((s,e)=>s+getNet(e),0)));
+  document.getElementById('deptBars').innerHTML = groups.map(g=>{
+    const total = g.emps.reduce((s,e)=>s+getNet(e),0);
+    const pct = maxGrp>0 ? (total/maxGrp*100).toFixed(0) : 0;
+    return `<div class="dept-row">
+      <div class="dept-meta"><span class="dept-name">${g.name}</span><span class="dept-amt">${g.emps.length} emp · ${fmtRs(total)}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // alerts
+  const onLeaveEmps = EMPLOYEES.filter(e=>getLeave(e.id)>0).sort((a,b)=>getLeave(b.id)-getLeave(a.id));
+  document.getElementById('alertList').innerHTML = onLeaveEmps.length ? onLeaveEmps.slice(0,5).map((e,i)=>`
+    <div class="alert-item">
+      <div class="avatar" style="${avatarStyle(e.id)}">${e.initials}</div>
+      <div><div class="alert-name">${e.name}</div><div class="alert-sub">${getLeave(e.id)} leave day${getLeave(e.id)>1?'s':''}</div></div>
+      <span class="badge badge-on-leave" style="margin-left:auto">On Leave</span>
+    </div>`).join('') : `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">✅ No attendance issues this month</div>`;
+
+  // top earners
+  const sorted = [...EMPLOYEES].sort((a,b)=>getNet(b)-getNet(a));
+  document.getElementById('topEarnerMonth').textContent = MONTH_NAMES[currentMonth];
+  document.getElementById('earnerList').innerHTML = sorted.slice(0,5).map((e,i)=>`
+    <div class="earner-row">
+      <div class="rank">${i+1}</div>
+      <div class="avatar" style="${avatarStyle(e.id)}">${e.initials}</div>
+      <div class="earner-info">
+        <div class="earner-name">${e.name}</div>
+        <div class="earner-sub">${e.type==='daily'?'Daily wage':'Monthly'} · ${getLeave(e.id)} leave</div>
+      </div>
+      <div class="earner-amt">${fmtRs(getNet(e))}</div>
+    </div>`).join('');
+}
+
+// ---- EMPLOYEES TABLE ----
+function renderEmployeeTable(filter='', typeFilter=''){
+  const body = document.getElementById('empTableBody');
+  const q = (filter || document.getElementById('searchInput')?.value || '').toLowerCase();
+  const tf = typeFilter || document.getElementById('typeFilter')?.value || '';
+  const filtered = EMPLOYEES.filter(e=>{
+    const nameMatch = e.name.toLowerCase().includes(q);
+    const typeMatch = tf ? e.type===tf : true;
+    return nameMatch && typeMatch;
+  });
+
+  body.innerHTML = filtered.map((e,i)=>{
+    const net = getNet(e);
+    const base = getBaseFull(e);
+    const diff = net - base;
+    const l = getLeave(e.id);
+    let leaveClass = 'leave-inp';
+    if(l>=getDays()) leaveClass += ' full-absent';
+    else if(l>0) leaveClass += ' has-leave';
+    const netClass = diff<0 ? 'net-red' : 'net-green';
+    const diffTxt = diff<0 ? `<div class="diff-red">-${fmtRs(Math.abs(diff))}</div>` : diff>0 ? `<div class="diff-green">+${fmtRs(diff)}</div>` : `<div style="color:var(--muted);font-size:11.5px">No change</div>`;
+    return `<tr onclick="openDetail(${e.id})" style="cursor:pointer">
+      <td>
+        <div class="emp-row-info">
+          <div class="avatar" style="${avatarStyle(e.id)}">${e.initials}</div>
+          <div>
+            <div class="emp-name-text">${e.name}</div>
+            <div class="emp-role-text">${e.type==='daily'?'Daily wage':'Staff'}</div>
+          </div>
+        </div>
+      </td>
+      <td>${e.type==='daily' ? fmtRs(e.salary)+'/day' : fmtRs(e.salary)+'/mo'}</td>
+      <td onclick="event.stopPropagation()">
+        <input type="number" min="0" max="${getDays()}" value="${l}" class="${leaveClass}"
+          id="li-${e.id}" onchange="setLeave(${e.id},this.value)" oninput="setLeave(${e.id},this.value)"/>
+      </td>
+      <td>
+        <div class="${netClass}">${fmtRs(net)}</div>
+        ${diffTxt}
+      </td>
+      <td onclick="event.stopPropagation()">
+        <button class="details-btn" onclick="openDetail(${e.id})">👁 Details</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableFooter').textContent = `Showing ${filtered.length} of ${EMPLOYEES.length} employees`;
+}
+
+function filterEmployees(){
+  renderEmployeeTable();
+}
+
+function setLeave(id, val){
+  let v = parseInt(val); if(isNaN(v)||v<0) v=0; if(v>getDays()) v=getDays();
+  leaves[id]=v;
+  const inp = document.getElementById('li-'+id);
+  if(inp){
+    inp.value=v;
+    inp.className='leave-inp'+(v>=getDays()?' full-absent':v>0?' has-leave':'');
+  }
+  renderAll();
+}
+
+// ---- DETAIL PAGE ----
+function openDetail(id){
+  const emp = EMPLOYEES.find(e=>e.id===id);
+  if(!emp) return;
+  document.getElementById('pageTitle').textContent = emp.name;
+  const days = getDays();
+  const l = getLeave(id);
+  const present = getPresent(id);
+  const net = getNet(emp);
+  const base = getBaseFull(emp);
+  const deduction = getDeduction(emp);
+  const dailyRate = getDailyRate(emp);
+  const diff = net - base;
+  const diffTxt = diff===0 ? '— No change from base' : diff<0 ? `-${fmtRs(Math.abs(diff))} deducted` : `+${fmtRs(diff)} added`;
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="avatar-lg" style="${avatarStyle(emp.id)}">${emp.initials}</div>
+        <div>
+          <div class="profile-name">${emp.name}</div>
+          <div class="profile-role">${emp.type==='daily'?'Daily Wage Worker':'Staff Member'}</div>
+        </div>
+      </div>
+      <div class="profile-meta">
+        <span class="badge ${emp.type==='daily'?'badge-daily':'badge-monthly'}">${emp.type}</span>
+        <span class="badge badge-active">${l===days?'Absent':'Active'}</span>
+      </div>
+    </div>
+
+    <div class="edit-card">
+      <h4>✏️ Edit Leave Days</h4>
+      <div class="form-group">
+        <label class="form-label">Leave Days (max ${days})</label>
+        <input class="form-input" type="number" min="0" max="${days}" value="${l}" id="det-leave" style="width:140px"/>
+      </div>
+      <button class="save-btn" onclick="saveDetail(${id})">💾 Save Changes</button>
+    </div>
+
+    <div class="net-highlight">
+      <div class="net-label">💰 Net Monthly Salary</div>
+      <div class="net-amount">${fmtRs(net)}</div>
+      <div class="net-note">${diffTxt}</div>
+    </div>
+
+    <div class="breakdown-card">
+      <h4>Salary Breakdown</h4>
+      <div class="br-row"><span class="br-label">Gross Monthly</span><span>${fmtRs(base)}</span></div>
+      <div class="br-row"><span class="br-label">Daily Rate (${days} working days)</span><span>${fmtRs(dailyRate)}/day</span></div>
+      <div class="br-row"><span class="br-label">Leave Deduction (${l} days)</span><span class="${deduction>0?'br-val-red':''}">-${fmtRs(deduction)}</span></div>
+      <div class="br-row total"><span class="br-label">Net Salary</span><span class="br-val-blue">${fmtRs(net)}</span></div>
+    </div>
+
+    <div class="attendance-summary">
+      <h4>Attendance Summary</h4>
+      <div class="att-grid">
+        <div class="att-cell">
+          <div class="att-val green">${present}</div>
+          <div class="att-lbl">Days Present</div>
+        </div>
+        <div class="att-cell">
+          <div class="att-val orange">${l}</div>
+          <div class="att-lbl">Days Leave</div>
+        </div>
+        <div class="att-cell">
+          <div class="att-val purple">${days}</div>
+          <div class="att-lbl">Total Days</div>
+        </div>
+      </div>
+    </div>
+  `;
+  showPage('detail', null, false);
+}
+
+function saveDetail(id){
+  const v = parseInt(document.getElementById('det-leave').value)||0;
+  setLeave(id, v);
+  openDetail(id);
+}
+
+// ---- PAYROLL SUMMARY ----
+function renderPayroll(){
+  const totalNet = EMPLOYEES.reduce((s,e)=>s+getNet(e),0);
+  const totalBase = EMPLOYEES.reduce((s,e)=>s+getBaseFull(e),0);
+  const totalDed = totalBase - totalNet;
+  const totalLeaves = EMPLOYEES.reduce((s,e)=>s+getLeave(e.id),0);
+
+  document.getElementById('payrollTotal').innerHTML = `
+    <div class="pt-label">💰 Total Payroll — ${MONTH_NAMES[currentMonth]} ${new Date().getFullYear()}</div>
+    <div class="pt-amount">${fmtRs(totalNet)}</div>
+    <div class="pt-sub">Base: ${fmtRs(totalBase)} · Deductions: ${fmtRs(totalDed)} · ${totalLeaves} leave days</div>
+  `;
+
+  const sorted = [...EMPLOYEES].sort((a,b)=>getNet(b)-getNet(a));
+  document.getElementById('payrollBody').innerHTML = sorted.map(e=>{
+    const net=getNet(e), base=getBaseFull(e), ded=getDeduction(e), l=getLeave(e.id);
+    return `<tr>
+      <td><div class="emp-row-info"><div class="avatar" style="${avatarStyle(e.id)};width:32px;height:32px;font-size:11px">${e.initials}</div><span style="font-weight:600">${e.name}</span></div></td>
+      <td><span class="badge ${e.type==='daily'?'badge-daily':'badge-monthly'}">${e.type}</span></td>
+      <td>${fmtRs(base)}</td>
+      <td>${l} day${l!==1?'s':''}</td>
+      <td style="color:var(--red)">-${fmtRs(ded)}</td>
+      <td style="color:var(--accent);font-weight:700">${fmtRs(net)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('payrollFooter').textContent = `Total payable to 16 employees: ${fmtRs(totalNet)}`;
+}
+
+// ---- NAVIGATION ----
+function showPage(page, navEl, updateTitle=true){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(navEl) navEl.classList.add('active');
+  else if(page==='employees') document.querySelectorAll('.nav-item')[1].classList.add('active');
+  if(updateTitle){
+    const titles={dashboard:'Dashboard',employees:'Employees',payroll:'Payroll Summary'};
+    document.getElementById('pageTitle').textContent = titles[page]||'';
+  }
+  currentPage=page;
+  closeSidebar();
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('active');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+}
+
+function exportCSV(){
+  let csv=`SamajPay Payroll - ${MONTH_NAMES[currentMonth]} ${new Date().getFullYear()}\nName,Type,Base Salary,Leave Days,Deduction,Net Payable\n`;
+  EMPLOYEES.forEach(e=>{
+    csv+=`${e.name},${e.type},${Math.round(getBaseFull(e))},${getLeave(e.id)},${Math.round(getDeduction(e))},${Math.round(getNet(e))}\n`;
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`samajpay-${MONTH_NAMES[currentMonth].toLowerCase()}.csv`;
+  a.click();
+}
+
+// INIT
+initMonth();
+renderAll();
+
+// responsive two-col
+function checkLayout(){
+  const tc = document.querySelector('.two-col');
+  if(tc) tc.style.gridTemplateColumns = window.innerWidth<700 ? '1fr' : '1fr 1fr';
+}
+checkLayout();
+window.addEventListener('resize',checkLayout);
+</script>
+</body>
+</html>
